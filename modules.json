@@ -1,0 +1,22 @@
+[
+    "wortalAdBidAdapter",
+    "yandexBidAdapter",
+    "operaadsBidAdapter",
+    "consentManagement",
+    "consentManagementGpp",
+    "consentManagementUsp",
+    "gdprEnforcement",
+    "enrichmentFpdModule",
+    "gppControl_usnat",
+    "gppControl_usstates",
+    "gptPreAuction",
+    "sizeMappingV2",
+    "sizeMapping",
+    "videoModule",
+    "topicsFpdModule",
+    "express",
+    "dfpAdServerVideo",
+    "sharedIdSystem",
+    "uid2IdSystem",
+    "unifiedIdSystem"
+]

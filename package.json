@@ -6,7 +6,9 @@
   "scripts": {
     "serve": "gulp serve",
     "test": "gulp test",
-    "lint": "gulp lint"
+    "lint": "gulp lint",
+    "serve-wortal": "gulp serve --modules=modules.json",
+    "build-wortal": "gulp build --modules=modules.json"
   },
   "repository": {
     "type": "git",
@@ -133,7 +135,8 @@
     "express": "^4.15.4",
     "fun-hooks": "^0.9.9",
     "just-clone": "^1.0.2",
-    "live-connect-js": "^6.3.4"
+    "live-connect-js": "^6.3.4",
+    "prebid.js": "^8.36.0"
   },
   "optionalDependencies": {
     "fsevents": "^2.3.2"
