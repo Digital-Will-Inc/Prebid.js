@@ -3,7 +3,7 @@ import { registerBidder } from '../src/adapters/bidderFactory.js';
 import { BANNER } from '../src/mediaTypes.js'
 
 const BIDDER_CODE = 'wortal';
-const BIDDER_URL = 'http://wortal.local:8000/api/v1/prebid/bid/';
+const BIDDER_URL = 'https://ads.wortal.ai/api/v1/prebid/bid/';
 const DEFAULT_TTL = 180;
 const DEFAULT_CURRENCY = 'USD';
 const SUPPORTED_MEDIA_TYPES = [BANNER]
