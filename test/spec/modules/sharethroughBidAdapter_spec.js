@@ -38,19 +38,8 @@ describe('sharethrough adapter spec', function () {
       expect(spec.isBidRequestValid(invalidBidRequest)).to.eql(false);
     });
 
-    it('should return false if req has wrong bidder code', function () {
-      const invalidBidRequest = {
-        bidder: 'notSharethrough',
-        params: {
-          pkey: 'abc123',
-        },
-      };
-      expect(spec.isBidRequestValid(invalidBidRequest)).to.eql(false);
-    });
-
     it('should return true if req is correct', function () {
       const validBidRequest = {
-        bidder: 'sharethrough',
         params: {
           pkey: 'abc123',
         },
@@ -346,6 +335,41 @@ describe('sharethrough adapter spec', function () {
 
           expect(openRtbReq.user.ext.eids).to.deep.equal([]);
         });
+
+        it('should add ORTB2 device data to the request', () => {
+          const bidderRequestWithOrtb2Device = {
+            ...bidderRequest,
+            ...{
+              ortb2: {
+                device: {
+                  w: 980,
+                  h: 1720,
+                  dnt: 0,
+                  ua: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/125.0.6422.80 Mobile/15E148 Safari/604.1',
+                  language: 'en',
+                  devicetype: 1,
+                  make: 'Apple',
+                  model: 'iPhone 12 Pro Max',
+                  os: 'iOS',
+                  osv: '17.4',
+                },
+              },
+            },
+          };
+
+          const [request] = spec.buildRequests(bidRequests, bidderRequestWithOrtb2Device);
+
+          expect(request.data.device.w).to.equal(bidderRequestWithOrtb2Device.ortb2.device.w);
+          expect(request.data.device.h).to.equal(bidderRequestWithOrtb2Device.ortb2.device.h);
+          expect(request.data.device.dnt).to.equal(bidderRequestWithOrtb2Device.ortb2.device.dnt);
+          expect(request.data.device.ua).to.equal(bidderRequestWithOrtb2Device.ortb2.device.ua);
+          expect(request.data.device.language).to.equal(bidderRequestWithOrtb2Device.ortb2.device.language);
+          expect(request.data.device.devicetype).to.equal(bidderRequestWithOrtb2Device.ortb2.device.devicetype);
+          expect(request.data.device.make).to.equal(bidderRequestWithOrtb2Device.ortb2.device.make);
+          expect(request.data.device.model).to.equal(bidderRequestWithOrtb2Device.ortb2.device.model);
+          expect(request.data.device.os).to.equal(bidderRequestWithOrtb2Device.ortb2.device.os);
+          expect(request.data.device.osv).to.equal(bidderRequestWithOrtb2Device.ortb2.device.osv);
+        });
       });
 
       describe('no referer provided', () => {
@@ -422,6 +446,41 @@ describe('sharethrough adapter spec', function () {
 
             expect(openRtbReq.regs.gpp).to.be.undefined;
           });
+        });
+      });
+
+      describe('dsa', () => {
+        it('should properly attach dsa information to the request when applicable', () => {
+          bidderRequest.ortb2 = {
+            regs: {
+              ext: {
+                dsa: {
+                  'dsarequired': 1,
+                  'pubrender': 0,
+                  'datatopub': 1,
+                  'transparency': [{
+                    'domain': 'good-domain',
+                    'dsaparams': [1, 2]
+                  }, {
+                    'domain': 'bad-setup',
+                    'dsaparams': ['1', 3]
+                  }]
+                }
+              }
+            }
+          }
+
+          const openRtbReq = spec.buildRequests(bidRequests, bidderRequest)[0].data;
+          expect(openRtbReq.regs.ext.dsa.dsarequired).to.equal(1);
+          expect(openRtbReq.regs.ext.dsa.pubrender).to.equal(0);
+          expect(openRtbReq.regs.ext.dsa.datatopub).to.equal(1);
+          expect(openRtbReq.regs.ext.dsa.transparency).to.deep.equal([{
+            'domain': 'good-domain',
+            'dsaparams': [1, 2]
+          }, {
+            'domain': 'bad-setup',
+            'dsaparams': ['1', 3]
+          }]);
         });
       });
 
@@ -720,7 +779,7 @@ describe('sharethrough adapter spec', function () {
           const EXPECTED_AE_VALUE = 1;
 
           // ACT
-          bidderRequest['fledgeEnabled'] = true;
+          bidderRequest.paapi = {enabled: true};
           const builtRequests = spec.buildRequests(bidRequests, bidderRequest);
           const ACTUAL_AE_VALUE = builtRequests[0].data.imp[0].ext.ae;
 
